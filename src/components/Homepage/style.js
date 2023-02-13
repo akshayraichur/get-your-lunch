@@ -19,3 +19,9 @@ export const chipContainer = css`
   justify-content: center;
   column-gap: 1rem;
 `;
+
+export const cardContainer = css`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+`;

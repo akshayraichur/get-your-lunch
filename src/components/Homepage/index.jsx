@@ -1,28 +1,16 @@
-import { Chip, TextField } from "@mui/material";
+import { Skeleton, TextField } from "@mui/material";
 import React, { useState } from "react";
-import { searchContainer, searchBar, chipContainer } from "./style";
-
-const InitialChipDetails = [
-  { label: "Indian", variant: "filled" },
-  { label: "American", variant: "outlined" },
-  { label: "Canadian", variant: "outlined" },
-  { label: "Mexican", variant: "outlined" },
-  { label: "Chinese", variant: "outlined" },
-  { label: "Italian", variant: "outlined" },
-  { label: "Thai", variant: "outlined" },
-];
+import useGetMealFromCategories from "../../hooks/useGetMealFromCategories";
+import Card from "../Card";
+import Menu from "../Menu";
+import { searchContainer, searchBar, chipContainer, cardContainer } from "./style";
 
 const HomePage = () => {
-  const [chipDetails, setChipDetails] = useState(InitialChipDetails);
+  const [chipSelect, setChipSelect] = useState({ label: "Indian", variant: "filled" });
 
-  const onChipClick = (chipDetail, index) => {
-    let chip = [...chipDetails];
-    chip.forEach((eachChip) => {
-      eachChip.variant = "outlined";
-    });
-    chip[index].variant = "filled";
-    setChipDetails([...chip]);
-  };
+  const { data, isError, isLoading, refetch } = useGetMealFromCategories(chipSelect.label);
+
+  console.log(data);
   return (
     <>
       <section className={searchContainer}>
@@ -30,30 +18,22 @@ const HomePage = () => {
       </section>
 
       <section className={chipContainer}>
-        {chipDetails.map((chip, index) => (
-          <Chip
-            key={chip.label}
-            label={chip.label}
-            color="primary"
-            variant={chip.variant}
-            onClick={() => onChipClick(chip, index)}
-          />
-        ))}
+        <Menu setChipSelect={setChipSelect} refetch={refetch} />
       </section>
 
-      <section>
-        <div
-          style={{
-            margin: "1rem",
-            background: "#fff",
-            padding: "1rem",
-            height: "30vh",
-            width: "40vw",
-            borderRadius: "15px",
-          }}
-        >
-          <p>Listing 1</p>
-        </div>
+      <section className={cardContainer}>
+        {isLoading &&
+          [1, 2, 3].map((key) => (
+            <div key={key} style={{ margin: "0.2rem" }}>
+              <Skeleton variant="text" sx={{ fontSize: "1rem" }} />
+              <Skeleton variant="rounded" animation="wave" width={300} height={50} />
+              <Skeleton variant="text" sx={{ fontSize: "1rem" }} />
+              <Skeleton variant="rounded" animation="wave" width={300} height={50} />
+            </div>
+          ))}
+        {data?.data.meals.map((meal) => (
+          <Card title={meal.strMeal} key={meal.idMeal} imgThumb={meal.strMealThumb} id={meal.idMeal} />
+        ))}
       </section>
     </>
   );
